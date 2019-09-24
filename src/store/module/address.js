@@ -1,0 +1,52 @@
+import axios from '@/http/index'
+
+export default  {
+    namespaced:true,
+    state:{
+        list:[],
+        loading:true,
+        address:{}
+    },
+    getters:{
+
+    },
+    mutations:{
+        resetList(state,data){
+            state.list=data;
+        },
+        resetLoading(state,data){
+            state.loading=data;
+        },
+        resetAddress(state,data){
+            state.address=data;
+        }
+    },
+    actions:{   
+        findAll(context,params){
+            context.commit('resetLoading',true) 
+            axios.get('/address/findAll').then((res)=>{
+                    context.commit('resetList',res.data)
+            }).finally(()=>{
+                    context.commit('resetLoading',false)
+            })
+        },
+        setAddress(context,params){
+            context.commit('resetAddress',params)
+        },
+        saveOrUpdate(context,params){
+            axios.post('/address/saveOrUpdate',params).then((res)=>{
+                context.dispatch('findAll');
+            })
+        },
+        deleteAddressById(context,id){
+            axios.get('/address/deleteById',{params:{id}}).then((res)=>{
+                context.dispatch('findAll');
+            })
+        },
+        batchDeleteAddress(context,ids){
+            axios.post('/address/batchDelete',{ids:ids}).then((res)=>{
+                context.dispatch('findAll');
+            })
+        }
+    }
+}

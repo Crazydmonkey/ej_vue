@@ -1,0 +1,53 @@
+import axios from '@/http/index'
+
+export default {
+    namespaced:true,
+    state:{
+        name:'comment',
+        list:[],
+        loading:true,
+        comment:{},
+    },
+    getters:{
+
+    },
+    mutations:{
+        resetList(state,data){
+            state.list=data;
+        },
+        resetLoading(state,data){
+            state.loading=data;
+        },
+        resetComment(state,data){
+            state.comment=data;
+        }
+    },
+    actions:{
+        findAll(context,params){
+            context.commit('resetLoading',true)
+            axios.get('/comment/findAll').then((res)=>{
+                context.commit('resetList',res.data)
+            }).finally(()=>{
+                context.commit('resetLoading',false)
+            })
+        },
+        setComment(context,params){
+            context.commit('resetComment',params)
+        },
+        saveOrUpdate(context,params){
+            axios.post('/comment/saveOrUpdate',params).then((res)=>{
+                context.dispatch('findAll')
+            })
+        },
+        deleteCommentById(context,id){
+            axios.get('/comment/deleteById',{params:{id}}).then((res)=>{
+                context.dispatch('findAll');
+            })
+        },
+        batchDeleteComment(context,ids){
+            axios.post('/comment/batchDelete',{ids:ids}).then((res)=>{
+                context.dispatch('findAll')
+            })
+        }
+    }
+};
